@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function Navbar() {
   return (
-    <header className="bg-zinc-950 text-white">
+    <header className="bg-zinc-950 text-white print:hidden">
       <nav className="max-w-4xl mx-auto flex flex-col items-center gap-3 px-6 py-4">
         <span className="text-lg font-bold text-orange-500">
           ברק | מאמן כושר

@@ -1,37 +1,19 @@
-import { createClient } from "@/lib/supabase/server";
+import Link from "next/link";
+import { getWorkoutPlan } from "@/lib/getWorkoutPlan";
 import LogoutButton from "@/components/LogoutButton";
 import WeekSection from "@/components/admin/WeekSection";
 import AddWeekForm from "@/components/admin/AddWeekForm";
 import PrintButton from "@/components/admin/PrintButton";
+import PlanView from "@/components/PlanView";
+import { createClient } from "@/lib/supabase/server";
 
 export default async function AdminPage() {
   const supabase = await createClient();
-
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { data: weeksData, error } = await supabase
-    .from("workout_weeks")
-    .select("*, workouts(*, exercises(*))")
-    .order("week_number", { ascending: true })
-    .order("workout_number", { referencedTable: "workouts", ascending: true });
-
-  // מיון התרגילים בתוך כל אימון לפי זמן היצירה - עושים את זה כאן
-  // בג'אווהסקריפט (ולא בשאילתה עצמה) כי מיון של רמה שלישית מקוננת
-  // דורש syntax פחות פשוט מול Supabase.
-  const weeks = weeksData?.map((week) => ({
-    ...week,
-    workouts: (week.workouts ?? [])
-      .slice()
-      .sort((a, b) => a.workout_number - b.workout_number)
-      .map((workout) => ({
-        ...workout,
-        exercises: (workout.exercises ?? [])
-          .slice()
-          .sort((a, b) => new Date(a.created_at) - new Date(b.created_at)),
-      })),
-  }));
+  const { weeks, error } = await getWorkoutPlan();
 
   const nextWeekNumber = (weeks?.length ?? 0) + 1;
 
@@ -68,7 +50,7 @@ export default async function AdminPage() {
           <LogoutButton />
         </div>
 
-        <div className="flex flex-wrap items-center gap-3 mb-8">
+        <div className="flex flex-wrap items-center gap-3 mb-4">
           <div className="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm">
             <span className="text-white font-bold">{weeks?.length ?? 0}</span>
             <span className="text-zinc-500"> שבועות</span>
@@ -83,6 +65,22 @@ export default async function AdminPage() {
           </div>
           {weeks?.length > 0 && <PrintButton />}
         </div>
+
+        {weeks?.length > 0 && (
+          <div className="flex items-center gap-2 text-sm text-zinc-400 bg-zinc-900/60 border border-zinc-800 rounded-xl px-4 py-3 mb-8">
+            <span>🔗</span>
+            <span>
+              קישור קבוע לשליחה למתאמן - תמיד מציג את הגרסה העדכנית:{" "}
+            </span>
+            <Link
+              href="/plan"
+              target="_blank"
+              className="text-orange-400 hover:text-orange-300 underline"
+            >
+              trainer-site-chi.vercel.app/plan
+            </Link>
+          </div>
+        )}
 
         {error && (
           <div className="bg-red-950 border border-red-800 text-red-300 rounded-xl p-4 mb-6 text-sm">
@@ -105,65 +103,10 @@ export default async function AdminPage() {
       </div>
 
       {/* גרסת ההדפסה - מוסתרת לגמרי במסך הרגיל (hidden), ומופיעה
-          רק כשמדפיסים (print:block). שחור-לבן ונקי, בלי כפתורים
-          או שדות עריכה, מתאים למתאמן שמדפיס או שומר כ-PDF. */}
-      <div className="hidden print:block text-black bg-white p-8" dir="rtl">
-        <h1 className="text-2xl font-bold mb-1">תוכנית אימונים</h1>
-        <p className="text-sm text-gray-600 mb-8">ברק - מאמן כושר אישי</p>
-
-        {weeks?.map((week) => (
-          <div key={week.id} className="mb-8 break-inside-avoid">
-            <h2 className="text-xl font-bold mb-3 border-b-2 border-gray-800 pb-1">
-              שבוע {week.week_number}
-              {week.title ? ` - ${week.title}` : ""}
-            </h2>
-
-            {(week.workouts ?? []).map((workout) => (
-              <div key={workout.id} className="mb-5 break-inside-avoid">
-                <h3 className="text-base font-bold mb-2">
-                  אימון {workout.workout_number}
-                  {workout.title ? ` - ${workout.title}` : ""}
-                </h3>
-                <table className="w-full border-collapse text-sm">
-                  <thead>
-                    <tr>
-                      <th className="border border-gray-400 px-2 py-1 text-right">
-                        תרגיל
-                      </th>
-                      <th className="border border-gray-400 px-2 py-1 text-right">
-                        סטים
-                      </th>
-                      <th className="border border-gray-400 px-2 py-1 text-right">
-                        חזרות
-                      </th>
-                      <th className="border border-gray-400 px-2 py-1 text-right">
-                        משקל
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {(workout.exercises ?? []).map((exercise) => (
-                      <tr key={exercise.id}>
-                        <td className="border border-gray-400 px-2 py-1">
-                          {exercise.name}
-                        </td>
-                        <td className="border border-gray-400 px-2 py-1">
-                          {exercise.sets}
-                        </td>
-                        <td className="border border-gray-400 px-2 py-1">
-                          {exercise.reps}
-                        </td>
-                        <td className="border border-gray-400 px-2 py-1">
-                          {exercise.weight}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            ))}
-          </div>
-        ))}
+          רק כשמדפיסים (print:block). זהה בדיוק לתצוגה שמוצגת
+          למתאמן בעמוד /plan (PlanView משותף). */}
+      <div className="hidden print:block text-black bg-white p-8">
+        <PlanView weeks={weeks} />
       </div>
     </div>
   );

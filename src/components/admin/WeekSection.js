@@ -6,7 +6,8 @@ import {
 } from "@/app/admin/actions";
 
 const inputClass =
-  "w-full bg-transparent text-white rounded px-2 py-1 focus:bg-zinc-950 focus:outline-none focus:ring-1 focus:ring-orange-500";
+  "w-full bg-zinc-950 border border-zinc-700 text-white rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500";
+const labelClass = "block text-xs text-zinc-500 mb-1";
 
 export default function WeekSection({ week }) {
   const exercises = week.exercises ?? [];
@@ -31,142 +32,109 @@ export default function WeekSection({ week }) {
         </form>
       </div>
 
-      <table className="w-full text-right border-collapse">
-        <thead>
-          <tr className="text-zinc-400 text-sm border-b border-zinc-800">
-            <th className="py-2 font-medium">תרגיל</th>
-            <th className="py-2 font-medium">סטים</th>
-            <th className="py-2 font-medium">חזרות</th>
-            <th className="py-2 font-medium">משקל</th>
-            <th className="py-2 w-8"></th>
-          </tr>
-        </thead>
-        <tbody>
-          {exercises.map((exercise) => {
-            const formId = `exercise-${exercise.id}`;
-            return (
-              <tr key={exercise.id} className="border-b border-zinc-800/60">
-                <td className="py-2">
-                  <input
-                    form={formId}
-                    name="name"
-                    defaultValue={exercise.name}
-                    required
-                    className={inputClass}
-                  />
-                </td>
-                <td className="py-2 w-20">
-                  <input
-                    form={formId}
-                    name="sets"
-                    type="number"
-                    defaultValue={exercise.sets}
-                    required
-                    className={inputClass}
-                  />
-                </td>
-                <td className="py-2 w-20">
-                  <input
-                    form={formId}
-                    name="reps"
-                    type="number"
-                    defaultValue={exercise.reps}
-                    required
-                    className={inputClass}
-                  />
-                </td>
-                <td className="py-2 w-24">
-                  <input
-                    form={formId}
-                    name="weight"
-                    type="number"
-                    step="0.5"
-                    defaultValue={exercise.weight}
-                    required
-                    className={inputClass}
-                  />
-                </td>
-                <td className="py-2">
-                  <div className="flex gap-2">
-                    <button
-                      form={formId}
-                      type="submit"
-                      className="text-zinc-500 hover:text-orange-500 transition-colors"
-                      title="שמור שינויים"
-                    >
-                      💾
-                    </button>
-                    <form action={deleteExercise}>
-                      <input type="hidden" name="id" value={exercise.id} />
-                      <button
-                        type="submit"
-                        className="text-zinc-600 hover:text-red-500 transition-colors"
-                        title="מחק תרגיל"
-                      >
-                        ✕
-                      </button>
-                    </form>
-                  </div>
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
+      {/* כל תרגיל הוא כרטיס נפרד עם שדות מתויגים - כך שגם במסך צר
+          (טלפון) אפשר לראות בבירור מה כתוב בכל שדה, כי הם עוברים
+          שורה כשאין מקום (flex-wrap), במקום להידחס בטבלה נוקשה. */}
+      <div className="space-y-3 mb-4">
+        {exercises.map((exercise) => (
+          <form
+            key={exercise.id}
+            action={updateExercise}
+            className="flex flex-wrap items-end gap-3 bg-zinc-950/50 border border-zinc-800 rounded-xl p-3"
+          >
+            <input type="hidden" name="id" value={exercise.id} />
+            <div className="flex-1 min-w-[140px]">
+              <label className={labelClass}>תרגיל</label>
+              <input
+                name="name"
+                defaultValue={exercise.name}
+                required
+                className={inputClass}
+              />
+            </div>
+            <div className="w-20">
+              <label className={labelClass}>סטים</label>
+              <input
+                name="sets"
+                type="number"
+                defaultValue={exercise.sets}
+                required
+                className={inputClass}
+              />
+            </div>
+            <div className="w-20">
+              <label className={labelClass}>חזרות</label>
+              <input
+                name="reps"
+                type="number"
+                defaultValue={exercise.reps}
+                required
+                className={inputClass}
+              />
+            </div>
+            <div className="w-24">
+              <label className={labelClass}>משקל</label>
+              <input
+                name="weight"
+                type="number"
+                step="0.5"
+                defaultValue={exercise.weight}
+                required
+                className={inputClass}
+              />
+            </div>
+            <div className="flex gap-2">
+              <button
+                type="submit"
+                className="text-zinc-400 hover:text-orange-500 transition-colors text-lg px-1"
+                title="שמור שינויים"
+              >
+                💾
+              </button>
+              <button
+                type="submit"
+                formAction={deleteExercise}
+                className="text-zinc-500 hover:text-red-500 transition-colors text-lg px-1"
+                title="מחק תרגיל"
+              >
+                ✕
+              </button>
+            </div>
+          </form>
+        ))}
 
-      {/* טופס נפרד ונסתר לכל שורה, ששומר עריכה בלחיצה על 💾.
-          שמנו אותו כאן, מחוץ לטבלה, כי תגית <form> לא חוקית
-          בתוך <tr>. ה-inputs שבתוך הטבלה מתחברים אליו מרחוק
-          דרך attribute בשם form={formId}. */}
-      {exercises.map((exercise) => (
-        <form
-          key={exercise.id}
-          id={`exercise-${exercise.id}`}
-          action={updateExercise}
-        >
-          <input type="hidden" name="id" value={exercise.id} />
-        </form>
-      ))}
+        {exercises.length === 0 && (
+          <p className="text-zinc-500 text-sm py-2">
+            אין עדיין תרגילים בשבוע הזה - הוסף למטה.
+          </p>
+        )}
+      </div>
 
       <form
         action={addExercise}
-        className="flex flex-wrap items-end gap-3 mt-4 pt-4 border-t border-zinc-800"
+        className="flex flex-wrap items-end gap-3 pt-4 border-t border-zinc-800"
       >
         <input type="hidden" name="week_id" value={week.id} />
-        <div className="flex-1 min-w-[120px]">
-          <label className="block text-xs text-zinc-500 mb-1">תרגיל</label>
-          <input
-            name="name"
-            required
-            className="w-full bg-zinc-950 border border-zinc-700 text-white rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
-          />
+        <div className="flex-1 min-w-[140px]">
+          <label className={labelClass}>תרגיל</label>
+          <input name="name" required className={inputClass} />
         </div>
         <div className="w-20">
-          <label className="block text-xs text-zinc-500 mb-1">סטים</label>
-          <input
-            name="sets"
-            type="number"
-            required
-            className="w-full bg-zinc-950 border border-zinc-700 text-white rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
-          />
+          <label className={labelClass}>סטים</label>
+          <input name="sets" type="number" required className={inputClass} />
         </div>
         <div className="w-20">
-          <label className="block text-xs text-zinc-500 mb-1">חזרות</label>
-          <input
-            name="reps"
-            type="number"
-            required
-            className="w-full bg-zinc-950 border border-zinc-700 text-white rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
-          />
+          <label className={labelClass}>חזרות</label>
+          <input name="reps" type="number" required className={inputClass} />
         </div>
         <div className="w-24">
-          <label className="block text-xs text-zinc-500 mb-1">משקל</label>
+          <label className={labelClass}>משקל</label>
           <input
             name="weight"
             type="number"
             step="0.5"
             required
-            className="w-full bg-zinc-950 border border-zinc-700 text-white rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+            className={inputClass}
           />
         </div>
         <button

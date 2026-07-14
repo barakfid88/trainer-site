@@ -11,15 +11,38 @@ export default async function AdminPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { data: weeks, error } = await supabase
+  const { data: weeksData, error } = await supabase
     .from("workout_weeks")
-    .select("*, exercises(*)")
+    .select("*, workouts(*, exercises(*))")
     .order("week_number", { ascending: true })
-    .order("created_at", { foreignTable: "exercises", ascending: true });
+    .order("workout_number", { referencedTable: "workouts", ascending: true });
+
+  // מיון התרגילים בתוך כל אימון לפי זמן היצירה - עושים את זה כאן
+  // בג'אווהסקריפט (ולא בשאילתה עצמה) כי מיון של רמה שלישית מקוננת
+  // דורש syntax פחות פשוט מול Supabase.
+  const weeks = weeksData?.map((week) => ({
+    ...week,
+    workouts: (week.workouts ?? [])
+      .slice()
+      .sort((a, b) => a.workout_number - b.workout_number)
+      .map((workout) => ({
+        ...workout,
+        exercises: (workout.exercises ?? [])
+          .slice()
+          .sort((a, b) => new Date(a.created_at) - new Date(b.created_at)),
+      })),
+  }));
 
   const nextWeekNumber = (weeks?.length ?? 0) + 1;
-  const totalExercises =
-    weeks?.reduce((sum, w) => sum + (w.exercises?.length ?? 0), 0) ?? 0;
+
+  let totalWorkouts = 0;
+  let totalExercises = 0;
+  weeks?.forEach((w) => {
+    totalWorkouts += w.workouts?.length ?? 0;
+    w.workouts?.forEach((wo) => {
+      totalExercises += wo.exercises?.length ?? 0;
+    });
+  });
 
   return (
     <div className="relative min-h-[calc(100vh-64px)] overflow-hidden">
@@ -49,6 +72,10 @@ export default async function AdminPage() {
           <div className="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm">
             <span className="text-white font-bold">{weeks?.length ?? 0}</span>
             <span className="text-zinc-500"> שבועות</span>
+          </div>
+          <div className="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm">
+            <span className="text-white font-bold">{totalWorkouts}</span>
+            <span className="text-zinc-500"> אימונים</span>
           </div>
           <div className="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm">
             <span className="text-white font-bold">{totalExercises}</span>
@@ -86,46 +113,55 @@ export default async function AdminPage() {
 
         {weeks?.map((week) => (
           <div key={week.id} className="mb-8 break-inside-avoid">
-            <h2 className="text-lg font-bold mb-2 border-b border-gray-400 pb-1">
+            <h2 className="text-xl font-bold mb-3 border-b-2 border-gray-800 pb-1">
               שבוע {week.week_number}
               {week.title ? ` - ${week.title}` : ""}
             </h2>
-            <table className="w-full border-collapse text-sm">
-              <thead>
-                <tr>
-                  <th className="border border-gray-400 px-2 py-1 text-right">
-                    תרגיל
-                  </th>
-                  <th className="border border-gray-400 px-2 py-1 text-right">
-                    סטים
-                  </th>
-                  <th className="border border-gray-400 px-2 py-1 text-right">
-                    חזרות
-                  </th>
-                  <th className="border border-gray-400 px-2 py-1 text-right">
-                    משקל
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {(week.exercises ?? []).map((exercise) => (
-                  <tr key={exercise.id}>
-                    <td className="border border-gray-400 px-2 py-1">
-                      {exercise.name}
-                    </td>
-                    <td className="border border-gray-400 px-2 py-1">
-                      {exercise.sets}
-                    </td>
-                    <td className="border border-gray-400 px-2 py-1">
-                      {exercise.reps}
-                    </td>
-                    <td className="border border-gray-400 px-2 py-1">
-                      {exercise.weight}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+
+            {(week.workouts ?? []).map((workout) => (
+              <div key={workout.id} className="mb-5 break-inside-avoid">
+                <h3 className="text-base font-bold mb-2">
+                  אימון {workout.workout_number}
+                  {workout.title ? ` - ${workout.title}` : ""}
+                </h3>
+                <table className="w-full border-collapse text-sm">
+                  <thead>
+                    <tr>
+                      <th className="border border-gray-400 px-2 py-1 text-right">
+                        תרגיל
+                      </th>
+                      <th className="border border-gray-400 px-2 py-1 text-right">
+                        סטים
+                      </th>
+                      <th className="border border-gray-400 px-2 py-1 text-right">
+                        חזרות
+                      </th>
+                      <th className="border border-gray-400 px-2 py-1 text-right">
+                        משקל
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {(workout.exercises ?? []).map((exercise) => (
+                      <tr key={exercise.id}>
+                        <td className="border border-gray-400 px-2 py-1">
+                          {exercise.name}
+                        </td>
+                        <td className="border border-gray-400 px-2 py-1">
+                          {exercise.sets}
+                        </td>
+                        <td className="border border-gray-400 px-2 py-1">
+                          {exercise.reps}
+                        </td>
+                        <td className="border border-gray-400 px-2 py-1">
+                          {exercise.weight}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ))}
           </div>
         ))}
       </div>

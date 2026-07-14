@@ -14,9 +14,10 @@ export async function getWorkoutPlan() {
 
   const weeks = weeksData?.map((week) => ({
     ...week,
+    // סדר יורד - האימון האחרון שנוסף מופיע ראשון (למעלה).
     workouts: (week.workouts ?? [])
       .slice()
-      .sort((a, b) => a.workout_number - b.workout_number)
+      .sort((a, b) => b.workout_number - a.workout_number)
       .map((workout) => ({
         ...workout,
         exercises: (workout.exercises ?? [])

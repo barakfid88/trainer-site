@@ -5,6 +5,7 @@ import WeekSection from "@/components/admin/WeekSection";
 import AddWeekForm from "@/components/admin/AddWeekForm";
 import PrintButton from "@/components/admin/PrintButton";
 import PlanView from "@/components/PlanView";
+import DeleteAllButton from "@/components/admin/DeleteAllButton";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function AdminPage() {
@@ -47,7 +48,10 @@ export default async function AdminPage() {
               </h1>
             </div>
           </div>
-          <LogoutButton />
+          <div className="flex items-center gap-2">
+            {weeks?.length > 0 && <DeleteAllButton />}
+            <LogoutButton />
+          </div>
         </div>
 
         <div className="flex flex-wrap items-center gap-3 mb-4">

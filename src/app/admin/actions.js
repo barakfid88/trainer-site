@@ -9,6 +9,14 @@ import { revalidatePath } from "next/cache";
 //
 // מבנה הנתונים: שבוע (workout_weeks) מכיל כמה אימונים (workouts),
 // וכל אימון מכיל את התרגילים שלו (exercises).
+//
+// אחרי כל שינוי קוראים גם ל-revalidatePath("/plan") - זה עמוד
+// הצפייה הציבורי, וגם הוא צריך לדעת שהנתונים השתנו.
+
+function revalidateAll() {
+  revalidatePath("/admin");
+  revalidatePath("/plan");
+}
 
 export async function addWeek(formData) {
   const weekNumber = Number(formData.get("week_number"));
@@ -23,7 +31,7 @@ export async function addWeek(formData) {
     throw new Error(error.message);
   }
 
-  revalidatePath("/admin");
+  revalidateAll();
 }
 
 export async function deleteWeek(formData) {
@@ -36,7 +44,23 @@ export async function deleteWeek(formData) {
     throw new Error(error.message);
   }
 
-  revalidatePath("/admin");
+  revalidateAll();
+}
+
+// מוחק את התוכנית כולה - כל השבועות, ובזכות ON DELETE CASCADE
+// שהגדרנו במסד הנתונים, גם כל האימונים והתרגילים שבתוכם.
+export async function deleteAllWeeks() {
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("workout_weeks")
+    .delete()
+    .not("id", "is", null); // "תנאי" שתמיד נכון, כדי למחוק את כל השורות
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  revalidateAll();
 }
 
 export async function addWorkout(formData) {
@@ -53,7 +77,7 @@ export async function addWorkout(formData) {
     throw new Error(error.message);
   }
 
-  revalidatePath("/admin");
+  revalidateAll();
 }
 
 export async function deleteWorkout(formData) {
@@ -66,7 +90,7 @@ export async function deleteWorkout(formData) {
     throw new Error(error.message);
   }
 
-  revalidatePath("/admin");
+  revalidateAll();
 }
 
 export async function addExercise(formData) {
@@ -85,7 +109,7 @@ export async function addExercise(formData) {
     throw new Error(error.message);
   }
 
-  revalidatePath("/admin");
+  revalidateAll();
 }
 
 export async function updateExercise(formData) {
@@ -105,7 +129,7 @@ export async function updateExercise(formData) {
     throw new Error(error.message);
   }
 
-  revalidatePath("/admin");
+  revalidateAll();
 }
 
 export async function deleteExercise(formData) {
@@ -118,5 +142,5 @@ export async function deleteExercise(formData) {
     throw new Error(error.message);
   }
 
-  revalidatePath("/admin");
+  revalidateAll();
 }

@@ -16,7 +16,7 @@ export default function LogoutButton() {
   return (
     <button
       onClick={handleLogout}
-      className="text-sm text-zinc-400 hover:text-orange-500 transition-colors"
+      className="text-sm text-zinc-400 hover:text-red-400 border border-zinc-800 hover:border-red-900 rounded-full px-4 py-2 transition-colors"
     >
       התנתק
     </button>

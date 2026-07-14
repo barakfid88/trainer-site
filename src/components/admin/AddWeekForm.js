@@ -4,16 +4,16 @@ export default function AddWeekForm({ nextWeekNumber }) {
   return (
     <form
       action={addWeek}
-      className="flex flex-wrap items-end gap-3 bg-zinc-900 border border-zinc-800 border-dashed rounded-2xl p-6 mb-6"
+      className="flex flex-wrap items-end gap-3 bg-zinc-900/50 border border-dashed border-zinc-700 rounded-2xl p-5 mb-8"
     >
-      <div className="w-28">
-        <label className="block text-xs text-zinc-500 mb-1">מספר שבוע</label>
+      <div className="w-24">
+        <label className="block text-xs text-zinc-500 mb-1">שבוע מס'</label>
         <input
           name="week_number"
           type="number"
           defaultValue={nextWeekNumber}
           required
-          className="w-full bg-zinc-950 border border-zinc-700 text-white rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+          className="w-full bg-zinc-950 border border-zinc-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
         />
       </div>
       <div className="flex-1 min-w-[160px]">
@@ -23,14 +23,14 @@ export default function AddWeekForm({ nextWeekNumber }) {
         <input
           name="title"
           placeholder="למשל: התמקדות בפלג גוף עליון"
-          className="w-full bg-zinc-950 border border-zinc-700 text-white rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+          className="w-full bg-zinc-950 border border-zinc-700 text-white placeholder-zinc-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
         />
       </div>
       <button
         type="submit"
-        className="bg-orange-500 text-white px-5 py-1.5 rounded-lg text-sm font-medium hover:bg-orange-400 transition-colors"
+        className="flex items-center gap-1.5 bg-orange-500 text-white px-5 py-2 rounded-full text-sm font-medium hover:bg-orange-400 hover:shadow-lg hover:shadow-orange-500/20 transition-all"
       >
-        + הוסף שבוע חדש
+        <span className="text-base leading-none">+</span> הוסף שבוע
       </button>
     </form>
   );

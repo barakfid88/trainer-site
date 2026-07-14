@@ -1,4 +1,12 @@
-import { addExercise, deleteExercise, deleteWeek } from "@/app/admin/actions";
+import {
+  addExercise,
+  deleteExercise,
+  deleteWeek,
+  updateExercise,
+} from "@/app/admin/actions";
+
+const inputClass =
+  "w-full bg-transparent text-white rounded px-2 py-1 focus:bg-zinc-950 focus:outline-none focus:ring-1 focus:ring-orange-500";
 
 export default function WeekSection({ week }) {
   const exercises = week.exercises ?? [];
@@ -34,28 +42,91 @@ export default function WeekSection({ week }) {
           </tr>
         </thead>
         <tbody>
-          {exercises.map((exercise) => (
-            <tr key={exercise.id} className="border-b border-zinc-800/60">
-              <td className="py-2 text-white">{exercise.name}</td>
-              <td className="py-2 text-zinc-300">{exercise.sets}</td>
-              <td className="py-2 text-zinc-300">{exercise.reps}</td>
-              <td className="py-2 text-zinc-300">{exercise.weight}</td>
-              <td className="py-2">
-                <form action={deleteExercise}>
-                  <input type="hidden" name="id" value={exercise.id} />
-                  <button
-                    type="submit"
-                    className="text-zinc-600 hover:text-red-500 transition-colors"
-                    title="מחק תרגיל"
-                  >
-                    ✕
-                  </button>
-                </form>
-              </td>
-            </tr>
-          ))}
+          {exercises.map((exercise) => {
+            const formId = `exercise-${exercise.id}`;
+            return (
+              <tr key={exercise.id} className="border-b border-zinc-800/60">
+                <td className="py-2">
+                  <input
+                    form={formId}
+                    name="name"
+                    defaultValue={exercise.name}
+                    required
+                    className={inputClass}
+                  />
+                </td>
+                <td className="py-2 w-20">
+                  <input
+                    form={formId}
+                    name="sets"
+                    type="number"
+                    defaultValue={exercise.sets}
+                    required
+                    className={inputClass}
+                  />
+                </td>
+                <td className="py-2 w-20">
+                  <input
+                    form={formId}
+                    name="reps"
+                    type="number"
+                    defaultValue={exercise.reps}
+                    required
+                    className={inputClass}
+                  />
+                </td>
+                <td className="py-2 w-24">
+                  <input
+                    form={formId}
+                    name="weight"
+                    type="number"
+                    step="0.5"
+                    defaultValue={exercise.weight}
+                    required
+                    className={inputClass}
+                  />
+                </td>
+                <td className="py-2">
+                  <div className="flex gap-2">
+                    <button
+                      form={formId}
+                      type="submit"
+                      className="text-zinc-500 hover:text-orange-500 transition-colors"
+                      title="שמור שינויים"
+                    >
+                      💾
+                    </button>
+                    <form action={deleteExercise}>
+                      <input type="hidden" name="id" value={exercise.id} />
+                      <button
+                        type="submit"
+                        className="text-zinc-600 hover:text-red-500 transition-colors"
+                        title="מחק תרגיל"
+                      >
+                        ✕
+                      </button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
+
+      {/* טופס נפרד ונסתר לכל שורה, ששומר עריכה בלחיצה על 💾.
+          שמנו אותו כאן, מחוץ לטבלה, כי תגית <form> לא חוקית
+          בתוך <tr>. ה-inputs שבתוך הטבלה מתחברים אליו מרחוק
+          דרך attribute בשם form={formId}. */}
+      {exercises.map((exercise) => (
+        <form
+          key={exercise.id}
+          id={`exercise-${exercise.id}`}
+          action={updateExercise}
+        >
+          <input type="hidden" name="id" value={exercise.id} />
+        </form>
+      ))}
 
       <form
         action={addExercise}

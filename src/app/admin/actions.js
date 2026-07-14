@@ -55,6 +55,26 @@ export async function addExercise(formData) {
   revalidatePath("/admin");
 }
 
+export async function updateExercise(formData) {
+  const id = formData.get("id");
+  const name = formData.get("name");
+  const sets = Number(formData.get("sets"));
+  const reps = Number(formData.get("reps"));
+  const weight = Number(formData.get("weight"));
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("exercises")
+    .update({ name, sets, reps, weight })
+    .eq("id", id);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  revalidatePath("/admin");
+}
+
 export async function deleteExercise(formData) {
   const id = formData.get("id");
 

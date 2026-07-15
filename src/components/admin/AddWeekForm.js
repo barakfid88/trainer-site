@@ -1,10 +1,10 @@
 import { addWeek } from "@/app/admin/actions";
 import SubmitButton from "@/components/SubmitButton";
 
-export default function AddWeekForm({ nextWeekNumber }) {
+export default function AddWeekForm({ nextWeekNumber, action }) {
   return (
     <form
-      action={addWeek}
+      action={action ?? addWeek}
       className="flex flex-wrap items-end gap-3 bg-zinc-900/50 border border-dashed border-zinc-700 rounded-2xl p-5 mb-8"
     >
       <div className="w-24">

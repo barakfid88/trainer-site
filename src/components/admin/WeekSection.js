@@ -1,20 +1,43 @@
 "use client";
 
 import { useOptimistic } from "react";
-import { deleteWorkout } from "@/app/admin/actions";
+import { addWorkout, deleteWorkout } from "@/app/admin/actions";
 import WorkoutSection from "@/components/admin/WorkoutSection";
 import AddWorkoutForm from "@/components/admin/AddWorkoutForm";
 import SubmitButton from "@/components/SubmitButton";
 
+function workoutsReducer(state, action) {
+  if (action.type === "add") {
+    return [action.workout, ...state];
+  }
+  if (action.type === "remove") {
+    return state.filter((w) => w.id !== action.id);
+  }
+  return state;
+}
+
 export default function WeekSection({ week, onDeleteWeek }) {
-  const [workouts, removeWorkoutOptimistic] = useOptimistic(
+  const [workouts, dispatchWorkout] = useOptimistic(
     week.workouts ?? [],
-    (state, removedId) => state.filter((w) => w.id !== removedId)
+    workoutsReducer
   );
 
   async function handleDeleteWorkout(formData) {
-    removeWorkoutOptimistic(formData.get("id"));
+    dispatchWorkout({ type: "remove", id: formData.get("id") });
     await deleteWorkout(formData);
+  }
+
+  async function handleAddWorkout(formData) {
+    dispatchWorkout({
+      type: "add",
+      workout: {
+        id: `temp-${crypto.randomUUID()}`,
+        workout_number: Number(formData.get("workout_number")),
+        title: formData.get("title") || null,
+        exercises: [],
+      },
+    });
+    await addWorkout(formData);
   }
 
   const nextWorkoutNumber = workouts.length + 1;
@@ -61,7 +84,11 @@ export default function WeekSection({ week, onDeleteWeek }) {
         </p>
       )}
 
-      <AddWorkoutForm weekId={week.id} nextWorkoutNumber={nextWorkoutNumber} />
+      <AddWorkoutForm
+        weekId={week.id}
+        nextWorkoutNumber={nextWorkoutNumber}
+        action={handleAddWorkout}
+      />
     </div>
   );
 }

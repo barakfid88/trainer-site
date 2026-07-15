@@ -1,10 +1,10 @@
 import { addWorkout } from "@/app/admin/actions";
 import SubmitButton from "@/components/SubmitButton";
 
-export default function AddWorkoutForm({ weekId, nextWorkoutNumber }) {
+export default function AddWorkoutForm({ weekId, nextWorkoutNumber, action }) {
   return (
     <form
-      action={addWorkout}
+      action={action ?? addWorkout}
       className="flex flex-wrap items-end gap-3 bg-zinc-950/30 border border-dashed border-zinc-700 rounded-xl p-4 mb-4"
     >
       <input type="hidden" name="week_id" value={weekId} />

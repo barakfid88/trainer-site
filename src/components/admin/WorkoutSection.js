@@ -8,18 +8,43 @@ const inputClass =
   "w-full bg-zinc-950 border border-zinc-700 text-white rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors";
 const labelClass = "block text-xs text-zinc-500 mb-1";
 
+// "reducer" קטן שיודע לטפל בשני סוגי שינויים אופטימיים - הוספה ומחיקה.
+function exercisesReducer(state, action) {
+  if (action.type === "add") {
+    return [...state, action.exercise];
+  }
+  if (action.type === "remove") {
+    return state.filter((e) => e.id !== action.id);
+  }
+  return state;
+}
+
 export default function WorkoutSection({ workout, onDeleteWorkout }) {
-  // useOptimistic נותן לנו עותק "מיידי" של רשימת התרגילים - כשמוחקים,
-  // השורה נעלמת מהמסך באותו רגע, בלי לחכות שהשרת יאשר את המחיקה.
+  // useOptimistic נותן לנו עותק "מיידי" של רשימת התרגילים - גם הוספה
+  // וגם מחיקה מופיעות על המסך באותו רגע, בלי לחכות לתשובה מהשרת.
   // אם משהו ישתבש, React יחזיר את המצב האמיתי אוטומטית.
-  const [exercises, removeExerciseOptimistic] = useOptimistic(
+  const [exercises, dispatchExercise] = useOptimistic(
     workout.exercises ?? [],
-    (state, removedId) => state.filter((e) => e.id !== removedId)
+    exercisesReducer
   );
 
   async function handleDeleteExercise(formData) {
-    removeExerciseOptimistic(formData.get("id"));
+    dispatchExercise({ type: "remove", id: formData.get("id") });
     await deleteExercise(formData);
+  }
+
+  async function handleAddExercise(formData) {
+    dispatchExercise({
+      type: "add",
+      exercise: {
+        id: `temp-${crypto.randomUUID()}`,
+        name: formData.get("name"),
+        sets: Number(formData.get("sets")),
+        reps: Number(formData.get("reps")),
+        weight: Number(formData.get("weight")),
+      },
+    });
+    await addExercise(formData);
   }
 
   return (
@@ -119,7 +144,7 @@ export default function WorkoutSection({ workout, onDeleteWorkout }) {
       </div>
 
       <form
-        action={addExercise}
+        action={handleAddExercise}
         className="flex flex-wrap items-end gap-2 pt-3 border-t border-zinc-800"
       >
         <input type="hidden" name="workout_id" value={workout.id} />

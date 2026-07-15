@@ -2,7 +2,6 @@ import Link from "next/link";
 import { getWorkoutPlan } from "@/lib/getWorkoutPlan";
 import LogoutButton from "@/components/LogoutButton";
 import WeeksList from "@/components/admin/WeeksList";
-import AddWeekForm from "@/components/admin/AddWeekForm";
 import PrintButton from "@/components/admin/PrintButton";
 import PlanView from "@/components/PlanView";
 import DeleteAllButton from "@/components/admin/DeleteAllButton";
@@ -15,8 +14,6 @@ export default async function AdminPage() {
   } = await supabase.auth.getUser();
 
   const { weeks, error } = await getWorkoutPlan(supabase);
-
-  const nextWeekNumber = (weeks?.length ?? 0) + 1;
 
   let totalWorkouts = 0;
   let totalExercises = 0;
@@ -89,15 +86,6 @@ export default async function AdminPage() {
         {error && (
           <div className="bg-red-950 border border-red-800 text-red-300 rounded-xl p-4 mb-6 text-sm">
             שגיאה בטעינת הנתונים: {error.message}
-          </div>
-        )}
-
-        <AddWeekForm nextWeekNumber={nextWeekNumber} />
-
-        {weeks?.length === 0 && (
-          <div className="text-center py-16 text-zinc-500">
-            <div className="text-4xl mb-3">📋</div>
-            עדיין אין שבועות בתוכנית - הוסף שבוע ראשון למעלה כדי להתחיל.
           </div>
         )}
 

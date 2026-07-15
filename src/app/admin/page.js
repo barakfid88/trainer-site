@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { getWorkoutPlan } from "@/lib/getWorkoutPlan";
 import LogoutButton from "@/components/LogoutButton";
-import WeekSection from "@/components/admin/WeekSection";
+import WeeksList from "@/components/admin/WeeksList";
 import AddWeekForm from "@/components/admin/AddWeekForm";
 import PrintButton from "@/components/admin/PrintButton";
 import PlanView from "@/components/PlanView";
@@ -101,9 +101,7 @@ export default async function AdminPage() {
           </div>
         )}
 
-        {weeks?.map((week) => (
-          <WeekSection key={week.id} week={week} />
-        ))}
+        <WeeksList weeks={weeks ?? []} />
       </div>
 
       {/* גרסת ההדפסה - מוסתרת לגמרי במסך הרגיל (hidden), ומופיעה

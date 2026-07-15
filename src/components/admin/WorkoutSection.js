@@ -1,17 +1,26 @@
-import {
-  addExercise,
-  deleteExercise,
-  deleteWorkout,
-  updateExercise,
-} from "@/app/admin/actions";
+"use client";
+
+import { useOptimistic } from "react";
+import { addExercise, deleteExercise, updateExercise } from "@/app/admin/actions";
 import SubmitButton from "@/components/SubmitButton";
 
 const inputClass =
   "w-full bg-zinc-950 border border-zinc-700 text-white rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors";
 const labelClass = "block text-xs text-zinc-500 mb-1";
 
-export default function WorkoutSection({ workout }) {
-  const exercises = workout.exercises ?? [];
+export default function WorkoutSection({ workout, onDeleteWorkout }) {
+  // useOptimistic נותן לנו עותק "מיידי" של רשימת התרגילים - כשמוחקים,
+  // השורה נעלמת מהמסך באותו רגע, בלי לחכות שהשרת יאשר את המחיקה.
+  // אם משהו ישתבש, React יחזיר את המצב האמיתי אוטומטית.
+  const [exercises, removeExerciseOptimistic] = useOptimistic(
+    workout.exercises ?? [],
+    (state, removedId) => state.filter((e) => e.id !== removedId)
+  );
+
+  async function handleDeleteExercise(formData) {
+    removeExerciseOptimistic(formData.get("id"));
+    await deleteExercise(formData);
+  }
 
   return (
     <div className="bg-zinc-950/40 border border-zinc-800 rounded-xl p-4 mb-3">
@@ -22,7 +31,7 @@ export default function WorkoutSection({ workout }) {
             <span className="text-zinc-500 font-normal"> · {workout.title}</span>
           )}
         </h3>
-        <form action={deleteWorkout}>
+        <form action={onDeleteWorkout}>
           <input type="hidden" name="id" value={workout.id} />
           <SubmitButton
             pendingText="מוחק..."
@@ -92,8 +101,7 @@ export default function WorkoutSection({ workout }) {
                 💾
               </SubmitButton>
               <SubmitButton
-                formAction={deleteExercise}
-                pendingText="⏳"
+                formAction={handleDeleteExercise}
                 className="text-zinc-500 hover:text-red-500 hover:scale-110 transition-all text-lg px-1.5 py-1"
                 title="מחק תרגיל"
               >

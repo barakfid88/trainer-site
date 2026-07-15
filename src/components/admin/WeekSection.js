@@ -1,10 +1,22 @@
-import { deleteWeek } from "@/app/admin/actions";
+"use client";
+
+import { useOptimistic } from "react";
+import { deleteWorkout } from "@/app/admin/actions";
 import WorkoutSection from "@/components/admin/WorkoutSection";
 import AddWorkoutForm from "@/components/admin/AddWorkoutForm";
 import SubmitButton from "@/components/SubmitButton";
 
-export default function WeekSection({ week }) {
-  const workouts = week.workouts ?? [];
+export default function WeekSection({ week, onDeleteWeek }) {
+  const [workouts, removeWorkoutOptimistic] = useOptimistic(
+    week.workouts ?? [],
+    (state, removedId) => state.filter((w) => w.id !== removedId)
+  );
+
+  async function handleDeleteWorkout(formData) {
+    removeWorkoutOptimistic(formData.get("id"));
+    await deleteWorkout(formData);
+  }
+
   const nextWorkoutNumber = workouts.length + 1;
 
   return (
@@ -24,7 +36,7 @@ export default function WeekSection({ week }) {
             )}
           </h2>
         </div>
-        <form action={deleteWeek}>
+        <form action={onDeleteWeek}>
           <input type="hidden" name="id" value={week.id} />
           <SubmitButton
             pendingText="מוחק..."
@@ -36,7 +48,11 @@ export default function WeekSection({ week }) {
       </div>
 
       {workouts.map((workout) => (
-        <WorkoutSection key={workout.id} workout={workout} />
+        <WorkoutSection
+          key={workout.id}
+          workout={workout}
+          onDeleteWorkout={handleDeleteWorkout}
+        />
       ))}
 
       {workouts.length === 0 && (

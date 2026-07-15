@@ -1,4 +1,5 @@
 import { addWorkout } from "@/app/admin/actions";
+import SubmitButton from "@/components/SubmitButton";
 
 export default function AddWorkoutForm({ weekId, nextWorkoutNumber }) {
   return (
@@ -27,12 +28,12 @@ export default function AddWorkoutForm({ weekId, nextWorkoutNumber }) {
           className="w-full bg-zinc-950 border border-zinc-700 text-white placeholder-zinc-600 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
         />
       </div>
-      <button
-        type="submit"
+      <SubmitButton
+        pendingText="מוסיף..."
         className="flex items-center gap-1.5 bg-zinc-700 text-white px-4 py-1.5 rounded-full text-sm font-medium hover:bg-zinc-600 transition-colors"
       >
         <span className="text-base leading-none">+</span> הוסף אימון
-      </button>
+      </SubmitButton>
     </form>
   );
 }

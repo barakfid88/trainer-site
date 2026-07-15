@@ -14,7 +14,7 @@ export default async function AdminPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { weeks, error } = await getWorkoutPlan();
+  const { weeks, error } = await getWorkoutPlan(supabase);
 
   const nextWeekNumber = (weeks?.length ?? 0) + 1;
 

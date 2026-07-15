@@ -4,6 +4,7 @@ import {
   deleteWorkout,
   updateExercise,
 } from "@/app/admin/actions";
+import SubmitButton from "@/components/SubmitButton";
 
 const inputClass =
   "w-full bg-zinc-950 border border-zinc-700 text-white rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors";
@@ -23,12 +24,12 @@ export default function WorkoutSection({ workout }) {
         </h3>
         <form action={deleteWorkout}>
           <input type="hidden" name="id" value={workout.id} />
-          <button
-            type="submit"
+          <SubmitButton
+            pendingText="מוחק..."
             className="text-xs text-zinc-600 hover:text-red-500 transition-colors"
           >
             מחק אימון
-          </button>
+          </SubmitButton>
         </form>
       </div>
 
@@ -83,21 +84,21 @@ export default function WorkoutSection({ workout }) {
               />
             </div>
             <div className="flex gap-1">
-              <button
-                type="submit"
+              <SubmitButton
+                pendingText="⏳"
                 className="text-zinc-400 hover:text-orange-500 hover:scale-110 transition-all text-lg px-1.5 py-1"
                 title="שמור שינויים"
               >
                 💾
-              </button>
-              <button
-                type="submit"
+              </SubmitButton>
+              <SubmitButton
                 formAction={deleteExercise}
+                pendingText="⏳"
                 className="text-zinc-500 hover:text-red-500 hover:scale-110 transition-all text-lg px-1.5 py-1"
                 title="מחק תרגיל"
               >
                 ✕
-              </button>
+              </SubmitButton>
             </div>
           </form>
         ))}
@@ -136,12 +137,12 @@ export default function WorkoutSection({ workout }) {
             className={inputClass}
           />
         </div>
-        <button
-          type="submit"
+        <SubmitButton
+          pendingText="מוסיף..."
           className="flex items-center gap-1.5 bg-orange-500 text-white px-4 py-1.5 rounded-full text-sm font-medium hover:bg-orange-400 hover:shadow-lg hover:shadow-orange-500/20 transition-all"
         >
           <span className="text-base leading-none">+</span> הוסף תרגיל
-        </button>
+        </SubmitButton>
       </form>
     </div>
   );

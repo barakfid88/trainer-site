@@ -1,6 +1,7 @@
 import { deleteWeek } from "@/app/admin/actions";
 import WorkoutSection from "@/components/admin/WorkoutSection";
 import AddWorkoutForm from "@/components/admin/AddWorkoutForm";
+import SubmitButton from "@/components/SubmitButton";
 
 export default function WeekSection({ week }) {
   const workouts = week.workouts ?? [];
@@ -25,12 +26,12 @@ export default function WeekSection({ week }) {
         </div>
         <form action={deleteWeek}>
           <input type="hidden" name="id" value={week.id} />
-          <button
-            type="submit"
+          <SubmitButton
+            pendingText="מוחק..."
             className="text-sm text-zinc-500 hover:text-red-500 transition-colors"
           >
             מחק שבוע
-          </button>
+          </SubmitButton>
         </form>
       </div>
 

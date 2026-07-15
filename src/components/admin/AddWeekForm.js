@@ -1,4 +1,5 @@
 import { addWeek } from "@/app/admin/actions";
+import SubmitButton from "@/components/SubmitButton";
 
 export default function AddWeekForm({ nextWeekNumber }) {
   return (
@@ -26,12 +27,12 @@ export default function AddWeekForm({ nextWeekNumber }) {
           className="w-full bg-zinc-950 border border-zinc-700 text-white placeholder-zinc-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
         />
       </div>
-      <button
-        type="submit"
+      <SubmitButton
+        pendingText="מוסיף..."
         className="flex items-center gap-1.5 bg-orange-500 text-white px-5 py-2 rounded-full text-sm font-medium hover:bg-orange-400 hover:shadow-lg hover:shadow-orange-500/20 transition-all"
       >
         <span className="text-base leading-none">+</span> הוסף שבוע
-      </button>
+      </SubmitButton>
     </form>
   );
 }

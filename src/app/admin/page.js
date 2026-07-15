@@ -13,7 +13,15 @@ export default async function AdminPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { weeks, error } = await getWorkoutPlan(supabase);
+  // הפרופיל מחזיק את ה-slug הציבורי של המשתמש (למשל "barak" או "adam"),
+  // כדי לדעת איזה קישור /plan/[slug] להציג לו.
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("slug, display_name")
+    .eq("id", user.id)
+    .single();
+
+  const { weeks, error } = await getWorkoutPlan(user.id, supabase);
 
   let totalWorkouts = 0;
   let totalExercises = 0;
@@ -38,7 +46,7 @@ export default async function AdminPage() {
             </div>
             <div>
               <p className="text-orange-500 font-bold tracking-widest text-xs mb-1">
-                איזור מנהל · {user?.email}
+                איזור מנהל · {profile?.display_name ?? user?.email}
               </p>
               <h1 className="text-3xl font-extrabold text-white">
                 תוכניות אימונים
@@ -67,18 +75,18 @@ export default async function AdminPage() {
           {weeks?.length > 0 && <PrintButton />}
         </div>
 
-        {weeks?.length > 0 && (
+        {weeks?.length > 0 && profile?.slug && (
           <div className="flex items-center gap-2 text-sm text-zinc-400 bg-zinc-900/60 border border-zinc-800 rounded-xl px-4 py-3 mb-8">
             <span>🔗</span>
             <span>
               קישור קבוע לשליחה למתאמן - תמיד מציג את הגרסה העדכנית:{" "}
             </span>
             <Link
-              href="/plan"
+              href={`/plan/${profile.slug}`}
               target="_blank"
               className="text-orange-400 hover:text-orange-300 underline"
             >
-              trainer-site-chi.vercel.app/plan
+              trainer-site-chi.vercel.app/plan/{profile.slug}
             </Link>
           </div>
         )}
@@ -94,7 +102,7 @@ export default async function AdminPage() {
 
       {/* גרסת ההדפסה - מוסתרת לגמרי במסך הרגיל (hidden), ומופיעה
           רק כשמדפיסים (print:block). זהה בדיוק לתצוגה שמוצגת
-          למתאמן בעמוד /plan (PlanView משותף). */}
+          למתאמן בעמוד /plan/[slug] (PlanView משותף). */}
       <div className="hidden print:block text-black bg-white p-8">
         <PlanView weeks={weeks} />
       </div>

@@ -1,18 +1,19 @@
 import { createClient } from "@/lib/supabase/server";
 
-// שולף את התוכנית המלאה: שבועות עם האימונים שלהם, וכל אימון עם
-// התרגילים שלו - ממוין נכון. פונקציה משותפת שמשמשת גם את עמוד
-// האדמין (לתצוגת הדפסה) וגם את עמוד /plan הציבורי.
+// שולף את התוכנית המלאה של בעלים ספציפי (ownerId): שבועות עם
+// האימונים שלהם, וכל אימון עם התרגילים שלו - ממוין נכון. פונקציה
+// משותפת שמשמשת גם את עמוד האדמין וגם את עמוד /plan/[slug] הציבורי.
 //
 // אפשר להעביר לקוח Supabase קיים (existingClient) כדי לא ליצור
 // חיבור כפול מיותר - שימושי בעמוד האדמין, ששם ממילא כבר יוצרים
 // לקוח כדי לבדוק מי המשתמש המחובר.
-export async function getWorkoutPlan(existingClient) {
+export async function getWorkoutPlan(ownerId, existingClient) {
   const supabase = existingClient ?? (await createClient());
 
   const { data: weeksData, error } = await supabase
     .from("workout_weeks")
     .select("*, workouts(*, exercises(*))")
+    .eq("owner_id", ownerId)
     .order("week_number", { ascending: true })
     .order("workout_number", { referencedTable: "workouts", ascending: true });
 

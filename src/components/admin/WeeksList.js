@@ -53,7 +53,13 @@ export default function WeeksList({ weeks }) {
     await addWeek(formData);
   }
 
-  const nextWeekNumber = optimisticWeeks.length + 1;
+  // חשוב: לא סתם length + 1! אחרי מחיקת שבוע (למשל שבוע 1 מתוך
+  // 1,2,3 נשארים 2,3) אסור להציע מספר שכבר קיים - לכן מחשבים לפי
+  // המספר הגבוה ביותר הקיים בפועל, לא לפי כמות השבועות.
+  const nextWeekNumber =
+    optimisticWeeks.length > 0
+      ? Math.max(...optimisticWeeks.map((w) => w.week_number)) + 1
+      : 1;
   const activeWeek = optimisticWeeks.find((w) => w.id === activeWeekId);
 
   return (

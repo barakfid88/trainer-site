@@ -40,7 +40,12 @@ export default function WeekSection({ week, onDeleteWeek }) {
     await addWorkout(formData);
   }
 
-  const nextWorkoutNumber = workouts.length + 1;
+  // אותו תיקון כמו בשבועות - לפי המספר הגבוה ביותר הקיים, לא לפי
+  // כמות האימונים, כדי לא להתנגש במספר שכבר קיים אחרי מחיקה.
+  const nextWorkoutNumber =
+    workouts.length > 0
+      ? Math.max(...workouts.map((w) => w.workout_number)) + 1
+      : 1;
 
   return (
     <div className="bg-zinc-900/60 backdrop-blur border border-zinc-800 rounded-2xl p-6 shadow-xl shadow-black/20">

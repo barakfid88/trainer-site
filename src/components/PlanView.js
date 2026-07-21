@@ -35,6 +35,9 @@ export default function PlanView({ weeks }) {
                     <th className="border border-gray-400 px-2 py-1 text-right">
                       משקל
                     </th>
+                    <th className="border border-gray-400 px-2 py-1 text-right w-1/3">
+                      הערות
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -51,6 +54,9 @@ export default function PlanView({ weeks }) {
                       </td>
                       <td className="border border-gray-400 px-2 py-1">
                         {exercise.weight}
+                      </td>
+                      <td className="border border-gray-400 px-2 py-1 whitespace-pre-wrap">
+                        {exercise.notes}
                       </td>
                     </tr>
                   ))}

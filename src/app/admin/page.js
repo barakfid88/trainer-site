@@ -35,6 +35,7 @@ export default async function AdminPage() {
   return (
     <div className="relative min-h-[calc(100vh-64px)] overflow-hidden">
       <div className="pointer-events-none absolute -top-40 right-1/3 w-[36rem] h-[36rem] bg-orange-600/10 rounded-full blur-3xl print:hidden" />
+      <div className="pointer-events-none absolute top-40 left-0 w-[24rem] h-[24rem] bg-emerald-600/5 rounded-full blur-3xl print:hidden" />
 
       {/* כל האזור הזה נעלם בהדפסה (print:hidden) - זה ממשק הניהול
           האינטראקטיבי, לא מה שרוצים להדפיס למתאמן. */}
@@ -60,16 +61,16 @@ export default async function AdminPage() {
         </div>
 
         <div className="flex flex-wrap items-center gap-3 mb-4">
-          <div className="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm">
-            <span className="text-white font-bold">{weeks?.length ?? 0}</span>
+          <div className="bg-zinc-900/80 backdrop-blur border border-zinc-800 rounded-xl px-4 py-2.5 text-sm shadow-lg shadow-black/20">
+            <span className="text-orange-400 font-bold">{weeks?.length ?? 0}</span>
             <span className="text-zinc-500"> שבועות</span>
           </div>
-          <div className="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm">
-            <span className="text-white font-bold">{totalWorkouts}</span>
+          <div className="bg-zinc-900/80 backdrop-blur border border-zinc-800 rounded-xl px-4 py-2.5 text-sm shadow-lg shadow-black/20">
+            <span className="text-emerald-400 font-bold">{totalWorkouts}</span>
             <span className="text-zinc-500"> אימונים</span>
           </div>
-          <div className="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm">
-            <span className="text-white font-bold">{totalExercises}</span>
+          <div className="bg-zinc-900/80 backdrop-blur border border-zinc-800 rounded-xl px-4 py-2.5 text-sm shadow-lg shadow-black/20">
+            <span className="text-sky-400 font-bold">{totalExercises}</span>
             <span className="text-zinc-500"> תרגילים</span>
           </div>
           {weeks?.length > 0 && <PrintButton />}

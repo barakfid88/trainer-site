@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getWorkoutPlan } from "@/lib/getWorkoutPlan";
 import PlanView from "@/components/PlanView";
+import PlanCards from "@/components/PlanCards";
 import PrintButton from "@/components/admin/PrintButton";
 
 // עמוד ציבורי - בלי צורך בהתחברות. ה-slug בכתובת (למשל /plan/barak
@@ -57,9 +58,18 @@ export default async function PlanPage({ params }) {
       )}
 
       {hasContent && (
-        <div className="bg-white text-black rounded-2xl p-6 sm:p-10 shadow-2xl shadow-black/40 print:shadow-none print:rounded-none print:p-0">
-          <PlanView weeks={weeks} />
-        </div>
+        <>
+          {/* תצוגת מסך - כרטיסי תרגיל בגווני קרם על משטח אפור-כהה,
+              בסגנון אפליקציית כושר. גרסת ההדפסה נשארת נקייה בנפרד. */}
+          <div className="print:hidden bg-zinc-800 rounded-2xl p-6 sm:p-10 shadow-2xl shadow-black/40">
+            <PlanCards weeks={weeks} />
+          </div>
+
+          {/* תצוגת הדפסה/PDF - נשארת נקייה, שחור-לבן */}
+          <div className="hidden print:block text-black bg-white p-8">
+            <PlanView weeks={weeks} />
+          </div>
+        </>
       )}
     </div>
   );

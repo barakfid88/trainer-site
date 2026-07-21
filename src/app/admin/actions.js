@@ -99,11 +99,12 @@ export async function addExercise(formData) {
   const sets = Number(formData.get("sets"));
   const reps = Number(formData.get("reps"));
   const weight = Number(formData.get("weight"));
+  const notes = formData.get("notes");
 
   const supabase = await createClient();
   const { error } = await supabase
     .from("exercises")
-    .insert({ workout_id: workoutId, name, sets, reps, weight });
+    .insert({ workout_id: workoutId, name, sets, reps, weight, notes: notes || null });
 
   if (error) {
     throw new Error(error.message);
@@ -118,11 +119,12 @@ export async function updateExercise(formData) {
   const sets = Number(formData.get("sets"));
   const reps = Number(formData.get("reps"));
   const weight = Number(formData.get("weight"));
+  const notes = formData.get("notes");
 
   const supabase = await createClient();
   const { error } = await supabase
     .from("exercises")
-    .update({ name, sets, reps, weight })
+    .update({ name, sets, reps, weight, notes: notes || null })
     .eq("id", id);
 
   if (error) {
